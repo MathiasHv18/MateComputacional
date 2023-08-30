@@ -16,12 +16,15 @@ En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 
 
 def generarMatriz():
-    matrizAd = []
+    #Diccionar (Hash table)
+    matrizAd = {}
 
     dimensiones = int(input('Indique las dimensiones de la matriz a generar: '))
-    #Crea una matriz de X*X dimensiones con valor 0 en cada casilla    
+    
+    # Crea una matriz de X*X dimensiones con valor infinito en cada conexión
     for i in range(dimensiones):
-        matrizAd.append([0] * dimensiones )
+        for j in range(dimensiones):
+            matrizAd[(i, j)] = float('inf')
 
     opcionGenerar = input('Desea generar los valores de manera manual o aleatoria? M = Manual / A = Aleatoria: ')
     
@@ -29,18 +32,23 @@ def generarMatriz():
         for i in range(dimensiones):
             print('Ingrese los valores de la fila numero ' + str(i) + ': ')
             for j in range(dimensiones):
-                valor = input('Casilla ' + str(j) + ' de ' + str(dimensiones) + ': ')
-                matrizAd[i][j] = int(valor)
+                if i != j:
+                    valor = input('Casilla ' + str(j) + ' de ' + str(dimensiones) + ': ')
+                    matrizAd[(i, j)] = int(valor)
     else:
-       for i in range(dimensiones):
-           for j in range(dimensiones):
-               matrizAd[i][j] = random.randint(0,20)
+        for i in range(dimensiones):
+            for j in range(dimensiones):
+                if i != j:
+                    matrizAd[(i, j)] = random.randint(1, 20)  # Asigna pesos aleatorios de 1 a 20
 
     return matrizAd
 
-def dijkstra(grafo, puntoInicial, puntoFinal):
-    
-    pass
+def dijkstra(grafo, puntoInicial):
+    numNodos = len(grafo)
 
 matrizAd = generarMatriz()
 print(matrizAd)
+
+#puntoInicial = input('Ingrese el punto inicial: ')
+# 0 = A / 1 = B / 2 = C ...
+#dijkstra(matrizAd, puntoInicial)
