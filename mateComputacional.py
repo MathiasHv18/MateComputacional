@@ -4,7 +4,7 @@ import random
 Matriz adjacencia ejemplo
         H o r i z o n 
   V      A   B   C   D
-  e  A   0   4   0   5
+  e  A   0   1   0   5
   r  B   1   0   0   2
   t  C   0   0   0   3
   i  D   5   2   3   0
@@ -38,6 +38,9 @@ def generarMatriz():
 
     return matrizAd
 
+def dijkstra(grafo, puntoInicial, puntoFinal):
+    
+    pass
 
 matrizAd = generarMatriz()
 print(matrizAd)
