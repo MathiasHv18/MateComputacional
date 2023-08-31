@@ -36,6 +36,11 @@ def generarMatriz():
            for j in range(dimensiones):
                matrizAd[i][j] = random.randint(0,20)
 
+    #Convierte la matriz en simétrica
+    for i in range(dimensiones):
+        for j in range(i):
+            matrizAd[i][j] = matrizAd[j][i]
+
     return matrizAd
 
 
