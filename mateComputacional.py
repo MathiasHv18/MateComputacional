@@ -16,39 +16,28 @@ En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 
 
 def generarMatriz():
-    #Diccionar (Hash table)
-    matrizAd = {}
+    matrizAd = []
 
     dimensiones = int(input('Indique las dimensiones de la matriz a generar: '))
-    
-    # Crea una matriz de X*X dimensiones con valor infinito en cada conexión
+    #Crea una matriz de X*X dimensiones con valor 0 en cada casilla    
     for i in range(dimensiones):
-        for j in range(dimensiones):
-            matrizAd[(i, j)] = float('inf')
+        matrizAd.append([0] * dimensiones )
 
     opcionGenerar = input('Desea generar los valores de manera manual o aleatoria? M = Manual / A = Aleatoria: ')
-    
+
     if opcionGenerar.upper() == 'M':
         for i in range(dimensiones):
             print('Ingrese los valores de la fila numero ' + str(i) + ': ')
             for j in range(dimensiones):
-                if i != j:
-                    valor = input('Casilla ' + str(j) + ' de ' + str(dimensiones) + ': ')
-                    matrizAd[(i, j)] = int(valor)
+                valor = input('Casilla ' + str(j) + ' de ' + str(dimensiones) + ': ')
+                matrizAd[i][j] = int(valor)
     else:
-        for i in range(dimensiones):
-            for j in range(dimensiones):
-                if i != j:
-                    matrizAd[(i, j)] = random.randint(1, 20)  # Asigna pesos aleatorios de 1 a 20
+       for i in range(dimensiones):
+           for j in range(dimensiones):
+               matrizAd[i][j] = random.randint(0,20)
 
     return matrizAd
 
-def dijkstra(grafo, puntoInicial):
-    numNodos = len(grafo)
 
 matrizAd = generarMatriz()
 print(matrizAd)
-
-#puntoInicial = input('Ingrese el punto inicial: ')
-# 0 = A / 1 = B / 2 = C ...
-#dijkstra(matrizAd, puntoInicial)
