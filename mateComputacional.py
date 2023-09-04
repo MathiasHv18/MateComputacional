@@ -1,4 +1,5 @@
 import random
+import heapq
 
 """
 Matriz adjacencia ejemplo
@@ -15,34 +16,84 @@ En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
 
 
+def getShortestPath(matrizPesos, puntoInicial):
+    shortestPath = []
+    index = 0
+
+    for i,  list in enumerate(matrizPesos):
+        if i != puntoInicial:
+            shortestPath.append((list[puntoInicial], i))
+            index = i
+
+    return shortestPath
+
+
+def updateVisited(visited, indices, puntoInicial):
+
+    for i, indexJ in enumerate(indices):
+        visited[puntoInicial][indexJ[1]] = True
+        visited[i+1][puntoInicial] = True
+    return visited
+
+
+def dijkstra(matrizPesos, puntoInicial, dimensiones):
+
+    currentIndex = puntoInicial
+    visited = []
+    for i in range(dimensiones):
+        visited.append([])
+    for list in visited:
+        for i in range(dimensiones):
+            list.append(False)
+    visited[puntoInicial][puntoInicial] = True
+
+    nextNode = getShortestPath(matrizPesos, puntoInicial)
+    visited = updateVisited(visited, nextNode, puntoInicial)
+
+    heapq.heapify(nextNode)
+    print(visited)
+
+
 def generarMatriz():
     matrizAd = []
 
-    dimensiones = int(input('Indique las dimensiones de la matriz a generar: '))
-    #Crea una matriz de X*X dimensiones con valor 0 en cada casilla    
+    dimensiones = int(
+        input('Indique las dimensiones de la matriz a generar: '))
+    # Crea una matriz de X*X dimensiones con valor 0 en cada casilla
     for i in range(dimensiones):
-        matrizAd.append([0] * dimensiones )
+        matrizAd.append([0] * dimensiones)
 
-    opcionGenerar = input('Desea generar los valores de manera manual o aleatoria? M = Manual / A = Aleatoria: ')
+    opcionGenerar = input(
+        'Desea generar los valores de manera manual o aleatoria? M = Manual / A = Aleatoria: ')
 
     if opcionGenerar.upper() == 'M':
         for i in range(dimensiones):
             print('Ingrese los valores de la fila numero ' + str(i) + ': ')
             for j in range(dimensiones):
-                valor = input('Casilla ' + str(j) + ' de ' + str(dimensiones) + ': ')
+                valor = input('Casilla ' + str(j) + ' de ' +
+                              str(dimensiones) + ': ')
                 matrizAd[i][j] = int(valor)
     else:
-       for i in range(dimensiones):
-           for j in range(dimensiones):
-               matrizAd[i][j] = random.randint(0,20)
+        for i in range(dimensiones):
+            for j in range(dimensiones):
+                if i != j:
+                    matrizAd[i][j] = random.randint(0, 20)
+                else:
+                    matrizAd[i][j] = 0
 
-    #Convierte la matriz en simétrica
+    # Convierte la matriz en simétrica
     for i in range(dimensiones):
         for j in range(i):
             matrizAd[i][j] = matrizAd[j][i]
 
-    return matrizAd
+    return matrizAd, dimensiones
 
 
-matrizAd = generarMatriz()
-print(matrizAd)
+# matrizPesos, n = generarMatriz()
+
+matrizPesos = [[0, 7, 5, 5, 19], [7, 0, 10, 15, 12], [
+    5, 10, 0, 19, 4], [5, 15, 19, 0, 9], [19, 12, 4, 9, 0]]
+
+# print(matrizPesos)
+
+dijkstra(matrizPesos, 0, 5)
