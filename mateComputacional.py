@@ -15,14 +15,12 @@ Cada valor es el peso que toma de X lugar a Y lugar
 En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
 
-def getShortestPath(matrizPesos, puntoInicial):
+def getShortestPath(matrizPesos, currentIndex):
     shortestPath = []
-    index = 0
 
-    for i,  value in enumerate(matrizPesos[puntoInicial]):
+    for i,  value in enumerate(matrizPesos[currentIndex]):
         if value != 0:
             shortestPath.append((value, i))
-            index = i
 
     return shortestPath
 
@@ -38,9 +36,9 @@ def initializeVisitedMatrix(dimensiones, puntoInicial):
     visited[puntoInicial][puntoInicial] = True
     return visited
 
-def updateVisited(visited, indices, puntoInicial):
+def updateVisited(visited, listaDeVisitados, puntoInicial):
 
-    for i, indexJ in enumerate(indices):
+    for i, indexJ in enumerate(listaDeVisitados):
         visited[puntoInicial][indexJ[1]] = True
         visited[i+1][puntoInicial] = True
     return visited
@@ -63,16 +61,20 @@ def actualizarPesos(distancias,indice, oldPeso, newPeso):
     
 def dijkstra(matrizPesos, puntoInicial, dimensiones, puntoFinal):
 
-    distanciasFinales = crearDiccionario(dimensiones)
-    visited = initializeVisitedMatrix(dimensiones, puntoInicial)
-    nextNode = getShortestPath(matrizPesos, puntoInicial)
-    visited = updateVisited(visited, nextNode, puntoInicial)
     currentIndex = puntoInicial
+    distanciasFinales = crearDiccionario(dimensiones) #Canvas de distancias finales todo INFINITO
+    visited = initializeVisitedMatrix(dimensiones, puntoInicial) #Todo FALSO
+    nextNode = getShortestPath(matrizPesos, currentIndex) #Lista de nodos visitados desde el i actual junto a sus pesos
+    visited = updateVisited(visited, nextNode, puntoInicial) #Actualiza de todo FALSO a nodos visitados TRUE
+    
+    distanciasFinales = actualizarPesos(distanciasFinales, nodeAt[1], distanciasFinales[nodeAt[1]] ,nodeAt[0])#Actualiza el tiempo minimo a cada nodo
+
+    while distanciasFinales[puntoFinal] == float('inf'):
+        pass
 
     heapq.heapify(nextNode)
     nodeAt = heapq.heappop(nextNode)
     
-    distanciasFinales = actualizarPesos(distanciasFinales, nodeAt[1], distanciasFinales[nodeAt[1]] ,nodeAt[0])
 
     print(nodeAt)
     print(distanciasFinales)
