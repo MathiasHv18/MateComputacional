@@ -20,9 +20,9 @@ def getShortestPath(matrizPesos, puntoInicial):
     shortestPath = []
     index = 0
 
-    for i,  list in enumerate(matrizPesos):
-        if i != puntoInicial:
-            shortestPath.append((list[puntoInicial], i))
+    for i,  value in enumerate(matrizPesos[puntoInicial]):
+        if value != 0:
+            shortestPath.append((value, i))
             index = i
 
     return shortestPath
@@ -50,6 +50,7 @@ def dijkstra(matrizPesos, puntoInicial, dimensiones):
     nextNode = getShortestPath(matrizPesos, puntoInicial)
     visited = updateVisited(visited, nextNode, puntoInicial)
 
+    print(nextNode)
     heapq.heapify(nextNode)
     print(visited)
 
@@ -91,8 +92,11 @@ def generarMatriz():
 
 # matrizPesos, n = generarMatriz()
 
-matrizPesos = [[0, 7, 5, 5, 19], [7, 0, 10, 15, 12], [
-    5, 10, 0, 19, 4], [5, 15, 19, 0, 9], [19, 12, 4, 9, 0]]
+matrizPesos = [[0,  7,  5,  0, 0],
+               [7,  0,  10, 15, 12],
+               [5,  10, 0,  19, 4],
+               [0,  15, 19,  0, 9],
+               [0, 12, 4,  9, 0]]
 
 # print(matrizPesos)
 
