@@ -15,7 +15,6 @@ Cada valor es el peso que toma de X lugar a Y lugar
 En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
 
-
 def getShortestPath(matrizPesos, puntoInicial):
     shortestPath = []
     index = 0
@@ -27,6 +26,17 @@ def getShortestPath(matrizPesos, puntoInicial):
 
     return shortestPath
 
+def initializeVisitedMatrix(dimensiones, puntoInicial):
+    visited = []
+
+    for i in range(dimensiones):
+        visited.append([])
+    for list in visited:
+        for i in range(dimensiones):
+            list.append(False)
+    
+    visited[puntoInicial][puntoInicial] = True
+    return visited
 
 def updateVisited(visited, indices, puntoInicial):
 
@@ -35,24 +45,38 @@ def updateVisited(visited, indices, puntoInicial):
         visited[i+1][puntoInicial] = True
     return visited
 
-
-def dijkstra(matrizPesos, puntoInicial, dimensiones):
-
-    currentIndex = puntoInicial
-    visited = []
+def crearDiccionario(dimensiones):
+    tiemposNodos = {}
     for i in range(dimensiones):
-        visited.append([])
-    for list in visited:
-        for i in range(dimensiones):
-            list.append(False)
-    visited[puntoInicial][puntoInicial] = True
+        tiemposNodos[i] = float('inf')
+    return tiemposNodos
 
+def actualizarPesos(distancias,indice, oldPeso, newPeso):
+
+    if oldPeso == float('inf'):
+        distancias[indice] = newPeso
+    elif newPeso+distancias[indice] >= oldPeso + distancias[indice]:
+        return distancias
+    else:
+        distancias[indice] = newPeso + distancias[indice]
+        return distancias
+    
+def dijkstra(matrizPesos, puntoInicial, dimensiones, puntoFinal):
+
+    distanciasFinales = crearDiccionario(dimensiones)
+    visited = initializeVisitedMatrix(dimensiones, puntoInicial)
     nextNode = getShortestPath(matrizPesos, puntoInicial)
     visited = updateVisited(visited, nextNode, puntoInicial)
+    currentIndex = puntoInicial
 
-    print(nextNode)
     heapq.heapify(nextNode)
-    print(visited)
+    nodeAt = heapq.heappop(nextNode)
+    
+    distanciasFinales = actualizarPesos(distanciasFinales, nodeAt[1], distanciasFinales[nodeAt[1]] ,nodeAt[0])
+
+    print(nodeAt)
+    print(distanciasFinales)
+
 
 
 def generarMatriz():
@@ -100,4 +124,4 @@ matrizPesos = [[0,  7,  5,  0, 0],
 
 # print(matrizPesos)
 
-dijkstra(matrizPesos, 0, 5)
+dijkstra(matrizPesos, 0, 5, 3)
