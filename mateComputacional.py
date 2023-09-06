@@ -15,14 +15,6 @@ Cada valor es el peso que toma de X lugar a Y lugar
 En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
 
-def getShortestPath(matrizPesos, currentIndex):
-    shortestPath = []
-
-    for i,  value in enumerate(matrizPesos[currentIndex]):
-        if value != 0:
-            shortestPath.append((value, i))
-
-    return shortestPath
 
 def initializeVisitedMatrix(dimensiones, puntoInicial):
     visited = []
@@ -32,16 +24,17 @@ def initializeVisitedMatrix(dimensiones, puntoInicial):
     for list in visited:
         for i in range(dimensiones):
             list.append(False)
-    
+
     visited[puntoInicial][puntoInicial] = True
     return visited
 
-def updateVisited(visited, listaDeVisitados, puntoInicial):
 
-    for i, indexJ in enumerate(listaDeVisitados):
-        visited[puntoInicial][indexJ[1]] = True
-        visited[i+1][puntoInicial] = True
+def updateVisited(visited, i, j):
+
+    visited[i][j] = True
+    visited[j][i] = True
     return visited
+
 
 def crearDiccionario(dimensiones):
     tiemposNodos = {}
@@ -49,36 +42,70 @@ def crearDiccionario(dimensiones):
         tiemposNodos[i] = float('inf')
     return tiemposNodos
 
-def actualizarPesos(distancias,indice, oldPeso, newPeso):
+
+def actualizarPesos(distancias, indice, oldPeso, newPeso):
 
     if oldPeso == float('inf'):
         distancias[indice] = newPeso
+        return distancias
     elif newPeso+distancias[indice] >= oldPeso + distancias[indice]:
         return distancias
     else:
         distancias[indice] = newPeso + distancias[indice]
         return distancias
-    
+
+
+def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited):
+    shortestPath = []
+
+    for i,  value in enumerate(matrizPesos[currentIndex]):
+        if value != 0 and visited[currentIndex][i] == False:
+            shortestPath.append((value, i))
+
+    # Actualiza los tiempos estimados por cada nodo observado desde otro nodo
+    for nodeToUpdate in shortestPath:
+        actualizarPesos(
+            distanciasFinales, nodeToUpdate[1], distanciasFinales[nodeToUpdate[1]], nodeToUpdate[0])
+
+    return shortestPath, distanciasFinales
+
+
 def dijkstra(matrizPesos, puntoInicial, dimensiones, puntoFinal):
 
+    stepsList = []
+
     currentIndex = puntoInicial
-    distanciasFinales = crearDiccionario(dimensiones) #Canvas de distancias finales todo INFINITO
-    visited = initializeVisitedMatrix(dimensiones, puntoInicial) #Todo FALSO
-    nextNode = getShortestPath(matrizPesos, currentIndex) #Lista de nodos visitados desde el i actual junto a sus pesos
-    visited = updateVisited(visited, nextNode, puntoInicial) #Actualiza de todo FALSO a nodos visitados TRUE
-    
-    distanciasFinales = actualizarPesos(distanciasFinales, nodeAt[1], distanciasFinales[nodeAt[1]] ,nodeAt[0])#Actualiza el tiempo minimo a cada nodo
+    # Canvas de distancias finales todo INFINITO
+    distanciasFinales = crearDiccionario(dimensiones)
+    distanciasFinales[puntoInicial] = 0
+
+    # Todo FALSO porque no hemos visitado ni un Nodo
+    visited = initializeVisitedMatrix(dimensiones, puntoInicial)
+
+    tiempoFinal = 0
 
     while distanciasFinales[puntoFinal] == float('inf'):
-        pass
 
-    heapq.heapify(nextNode)
-    nodeAt = heapq.heappop(nextNode)
-    
+        stepsList.append(currentIndex)
+        # Lista de nodos visitados desde el i actual junto a sus pesos
+        nextNode, distanciasFinales = getShortestPath(
+            matrizPesos, currentIndex, distanciasFinales, visited)
+        heapq.heapify(nextNode)
+        nodeAt = heapq.heappop(nextNode)
 
-    print(nodeAt)
-    print(distanciasFinales)
+        # Actualiza de todo FALSO a nodo visitado TRUE
+        visited = updateVisited(visited, nodeAt[1], currentIndex)
 
+        currentIndex = nodeAt[1]
+        #Se vacea la lista de nodos posibles a visitar
+        nextNode = ()
+
+    for node in stepsList:
+        tiempoFinal = tiempoFinal + distanciasFinales[node]
+
+    tiempoFinal = tiempoFinal + distanciasFinales[puntoFinal]
+
+    return tiempoFinal, distanciasFinales
 
 
 def generarMatriz():
@@ -116,14 +143,26 @@ def generarMatriz():
     return matrizAd, dimensiones
 
 
-# matrizPesos, n = generarMatriz()
+#matrizPesos, n = generarMatriz()
+n = 5
 
-matrizPesos = [[0,  7,  5,  0, 0],
-               [7,  0,  10, 15, 12],
-               [5,  10, 0,  19, 4],
-               [0,  15, 19,  0, 9],
-               [0, 12, 4,  9, 0]]
+matrizPesos_ejemplo = [[0,  7,  5,  0, 0],
+                       [7,  0,  10, 15, 12],
+                       [5,  10, 0,  19, 4],
+                       [0,  15, 19,  0, 9],
+                       [0, 12, 4,  9, 0]]
 
-# print(matrizPesos)
+#print(matrizPesos)
 
-dijkstra(matrizPesos, 0, 5, 3)
+tiempoFinal = 0
+distanciasFinales = {}
+
+
+
+puntoInicial = int(input('Ingrese el punto inicial: '))
+puntoFinal =  int(input('Ingrese el punto final: '))
+
+tiempoFinal, distanciasFinales = dijkstra(matrizPesos_ejemplo, puntoInicial, n, puntoFinal)
+
+print(distanciasFinales)
+print('Demora ', tiempoFinal, ' minutos en llegar al punto ', puntoFinal)
