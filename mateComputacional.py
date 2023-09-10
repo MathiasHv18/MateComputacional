@@ -48,11 +48,12 @@ def actualizarPesos(distancias, indice, oldPeso, newPeso):
     if oldPeso == float('inf'):
         distancias[indice] = newPeso
         return distancias
-    elif newPeso+distancias[indice] >= oldPeso + distancias[indice]:
-        return distancias
-    else:
+    elif newPeso + distancias[indice] < oldPeso + distancias[indice]:
         distancias[indice] = newPeso + distancias[indice]
         return distancias
+    else:
+        return distancias
+
 
 
 def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited):
@@ -100,6 +101,7 @@ def dijkstra(matrizPesos, puntoInicial, dimensiones, puntoFinal):
         #Se vacea la lista de nodos posibles a visitar
         nextNode = ()
 
+    print(stepsList)
     for node in stepsList:
         tiempoFinal = tiempoFinal + distanciasFinales[node]
 
@@ -146,10 +148,10 @@ def generarMatriz():
 #matrizPesos, n = generarMatriz()
 n = 5
 
-matrizPesos_ejemplo = [[0,  7,  5,  0, 0],
+matrizPesos_ejemplo = [[0,  7,  0,  5, 0],
                        [7,  0,  10, 15, 12],
-                       [5,  10, 0,  19, 4],
-                       [0,  15, 19,  0, 9],
+                       [0,  10, 0,  19, 4],
+                       [5,  15, 19,  0, 9],
                        [0, 12, 4,  9, 0]]
 
 #print(matrizPesos)
