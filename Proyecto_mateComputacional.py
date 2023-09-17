@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import graphviz as gv
+import tkinter as tk
 
 """
 Matriz adjacencia ejemplo
@@ -16,6 +17,7 @@ Cada valor es el peso que toma de X lugar a Y lugar
 En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
 
+
 def createVisualGraph(matrizPesos):
     grafo = gv.Graph('grafo')
     n = len(matrizPesos)
@@ -27,7 +29,6 @@ def createVisualGraph(matrizPesos):
                 grafo.edge(str(i), str(j), label=str(peso))
 
     return grafo
-
 
 
 def initializeVisitedMatrix(dimensiones, puntoInicial):
@@ -68,11 +69,32 @@ def actualizarPesos(distanciasFinales, nodeToUpdate, stepsList, iteration, visit
     if iteration == 0:
         updateVisited(visited, currentIndex, nodeToUpdate[1])
         if distanciasFinales[nodeToUpdate[1]] == float('inf') or distanciasFinales[nodeToUpdate[1]] > distanciasFinales[currentIndex] + nodeToUpdate[0]:
-            distanciasFinales[nodeToUpdate[1]] = distanciasFinales[currentIndex] + nodeToUpdate[0]
+            distanciasFinales[nodeToUpdate[1]
+                              ] = distanciasFinales[currentIndex] + nodeToUpdate[0]
     else:
         if distanciasFinales[nodeToUpdate[1]] == float('inf') or distanciasFinales[nodeToUpdate[1]] > distanciasFinales[currentIndex] + nodeToUpdate[0]:
-            distanciasFinales[nodeToUpdate[1]] = distanciasFinales[currentIndex] + nodeToUpdate[0]
+            distanciasFinales[nodeToUpdate[1]
+                              ] = distanciasFinales[currentIndex] + nodeToUpdate[0]
     return distanciasFinales, visited
+
+
+def buscar_repetidos(lista_tuplas):
+
+    valoresRepetidos = []
+    contador = -1
+    for tupla in lista_tuplas:
+        valoresRepetidos.append(tupla[0])
+    
+    valoresRepetidos.sort()
+    minimoValor = valoresRepetidos[0]
+
+    for i in valoresRepetidos:
+        if i == minimoValor:
+            contador += 1
+    if contador == 0:
+        return -1, -1
+    else: 
+        return minimoValor, contador
 
 
 def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, stepsList):
@@ -85,7 +107,13 @@ def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, steps
 
     shortestPath = sorted(shortestPath, key=lambda x: x[0])
 
-    #print(shortestPath)
+    print(shortestPath)
+
+    if len(shortestPath) > 0:
+        valorRepetido, repeticiones = buscar_repetidos(shortestPath)
+        if shortestPath[0][0] == valorRepetido:
+            for i in range(repeticiones):
+                updateVisited(visited, currentIndex, shortestPath[i+1][1])
 
     # Actualiza los tiempos estimados por cada nodo observado desde otro nodo
     for i, nodeToUpdate in enumerate(shortestPath):
@@ -98,9 +126,9 @@ def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, steps
 def dijkstra(matrizPesos, puntoInicial, puntoFinal):
 
     dimensiones = len(matrizPesos)
-    #Nodos que el algoritmo a tenido que recorrer
+    # Nodos que el algoritmo a tenido que recorrer
     stepsList = []
-    #Punto inicial ingresado por el usuario
+    # Punto inicial ingresado por el usuario
     currentIndex = puntoInicial
     # Diccionario de distancias finales. Inicialmente todo INFINITO menos el punto inicial
     distanciasFinales = crearDiccionario(dimensiones)
@@ -110,7 +138,7 @@ def dijkstra(matrizPesos, puntoInicial, puntoFinal):
     visited = initializeVisitedMatrix(dimensiones, puntoInicial)
     visited = np.array(visited)
 
-    #Mientras que el punto final no se considere visitado, aplicar dijkstra
+    # Mientras que el punto final no se considere visitado, aplicar dijkstra
     while True:
 
         stepsList.append(currentIndex)
@@ -160,15 +188,16 @@ def generarMatriz():
     return matrizAd, dimensiones
 
 
-#matrizPesos, n = generarMatriz()
+# matrizPesos, n = generarMatriz()
 #
 matrizPesos = [[0,  0,  3,  0, 0, 2, 0],
-                [0,  0,  0, 1, 2, 0, 2],
-                [3,  0, 0,  4, 1, 2, 0],
-                [0,  1, 4,  0, 0, 0, 0],
-                [0, 2, 1,  0, 0, 3, 0],
-                [2, 0, 2,  0, 3, 0, 5],
-                [0, 2, 0,  0, 0, 5, 0]]
+               [0,  0,  0, 1, 2, 0, 2],
+               [3,  0, 0,  4, 1, 2, 0],
+               [0,  1, 4,  0, 0, 0, 0],
+               [0, 2, 1,  0, 0, 3, 0],
+               [2, 0, 2,  0, 3, 0, 5],
+               [0, 2, 0,  0, 0, 5, 0]]
+
 
 matrizPesos = np.array(matrizPesos)
 print(matrizPesos)
