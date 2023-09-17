@@ -1,6 +1,6 @@
 import random
-import heapq
 import numpy as np
+import graphviz as gv
 
 """
 Matriz adjacencia ejemplo
@@ -15,6 +15,19 @@ Se lee de 'A' hacia 'B'. Primero el horizontal y luego el vertical
 Cada valor es el peso que toma de X lugar a Y lugar
 En caso haya un 0 es porque no hay conexion directa entre ambas aristas
 """
+
+def createVisualGraph(matrizPesos):
+    grafo = gv.Graph('grafo')
+    n = len(matrizPesos)
+
+    for i in range(n):
+        for j in range(i+1, n):
+            peso = matrizPesos[i][j]
+            if peso != 0:
+                grafo.edge(str(i), str(j), label=str(peso))
+
+    return grafo
+
 
 
 def initializeVisitedMatrix(dimensiones, puntoInicial):
@@ -72,10 +85,7 @@ def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, steps
 
     shortestPath = sorted(shortestPath, key=lambda x: x[0])
 
-    print(shortestPath)
-
-    # shortestPath(VALOR, NODO)
-    # distanciasFinales(NODO) -> Peso Actual
+    #print(shortestPath)
 
     # Actualiza los tiempos estimados por cada nodo observado desde otro nodo
     for i, nodeToUpdate in enumerate(shortestPath):
@@ -87,23 +97,24 @@ def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, steps
 
 def dijkstra(matrizPesos, puntoInicial, puntoFinal):
 
-    dimensiones = len(matrizPesos_ejemplo)
+    dimensiones = len(matrizPesos)
+    #Nodos que el algoritmo a tenido que recorrer
     stepsList = []
-
+    #Punto inicial ingresado por el usuario
     currentIndex = puntoInicial
-    # Canvas de distancias finales todo INFINITO
+    # Diccionario de distancias finales. Inicialmente todo INFINITO menos el punto inicial
     distanciasFinales = crearDiccionario(dimensiones)
     distanciasFinales[puntoInicial] = 0
 
     # Todo FALSO porque no hemos visitado ni un Nodo
     visited = initializeVisitedMatrix(dimensiones, puntoInicial)
-
     visited = np.array(visited)
 
+    #Mientras que el punto final no se considere visitado, aplicar dijkstra
     while True:
 
         stepsList.append(currentIndex)
-        # Lista de nodos visitados desde el i actual junto a sus pesos
+        # Calcular los caminos desde algun nodo X
         nextNode, distanciasFinales, visited = getShortestPath(
             matrizPesos, currentIndex, distanciasFinales, visited, stepsList)
         currentIndex = nextNode
@@ -149,20 +160,21 @@ def generarMatriz():
     return matrizAd, dimensiones
 
 
-# matrizPesos, n = generarMatriz()
+#matrizPesos, n = generarMatriz()
+#
+matrizPesos = [[0,  0,  3,  0, 0, 2, 0],
+                [0,  0,  0, 1, 2, 0, 2],
+                [3,  0, 0,  4, 1, 2, 0],
+                [0,  1, 4,  0, 0, 0, 0],
+                [0, 2, 1,  0, 0, 3, 0],
+                [2, 0, 2,  0, 3, 0, 5],
+                [0, 2, 0,  0, 0, 5, 0]]
 
-matrizPesos_ejemplo = [[0,  0,  3,  0, 0, 2, 0],
-                       [0,  0,  0, 1, 2, 0, 2],
-                       [3,  0, 0,  4, 1, 2, 0],
-                       [0,  1, 4,  0, 0, 0, 0],
-                       [0, 2, 1,  0, 0, 3, 0],
-                       [2, 0, 2,  0, 3, 0, 5],
-                       [0, 2, 0,  0, 0, 5, 0]]
+matrizPesos = np.array(matrizPesos)
+print(matrizPesos)
+grafo = createVisualGraph(matrizPesos)
+grafo.render('MyGrafo', format='png')
 
-# print(matrizPesos)
-
-matrizPesos_ejemplo = np.array(matrizPesos_ejemplo)
-print(matrizPesos_ejemplo)
 
 distanciasFinales = {}
 
@@ -170,7 +182,7 @@ puntoInicial = int(input('Ingrese el punto inicial: '))
 puntoFinal = int(input('Ingrese el punto final: '))
 
 distanciasFinales = dijkstra(
-    matrizPesos_ejemplo, puntoInicial, puntoFinal)
+    matrizPesos, puntoInicial, puntoFinal)
 
 print('Distancias Finales: ', distanciasFinales)
 print('Demora ', distanciasFinales[puntoFinal],
