@@ -32,23 +32,8 @@ def createVisualGraph(matrizPesos):
 
 
 def initializeVisitedMatrix(dimensiones, puntoInicial):
-    visited = []
-
-    for i in range(dimensiones):
-        visited.append([])
-    for list in visited:
-        for i in range(dimensiones):
-            list.append(False)
-
-    visited[puntoInicial][puntoInicial] = True
-    return visited
-
-
-def updateVisited(visited, i, j):
-
-    visited[j][j] = True
-    visited[i][j] = True
-    visited[j][i] = True
+    visited = np.zeros((dimensiones, dimensiones))
+    visited[:, puntoInicial] = True
     return visited
 
 
@@ -59,6 +44,15 @@ def crearDiccionario(dimensiones):
     return tiemposNodos
 
 
+def updateVisited(visited, i, j):
+
+    visited[:, j] = True
+    visited[i, j] = True
+    visited[j, i] = True
+
+    return visited
+
+
 def actualizarPesos(distanciasFinales, nodeToUpdate, stepsList, iteration, visited, currentIndex):
 
     pesoFinal = 0
@@ -67,7 +61,7 @@ def actualizarPesos(distanciasFinales, nodeToUpdate, stepsList, iteration, visit
     pesoFinal = pesoFinal + nodeToUpdate[0]
 
     if iteration == 0:
-        updateVisited(visited, currentIndex, nodeToUpdate[1])
+        visited = updateVisited(visited, currentIndex, nodeToUpdate[1])
         if distanciasFinales[nodeToUpdate[1]] == float('inf') or distanciasFinales[nodeToUpdate[1]] > distanciasFinales[currentIndex] + nodeToUpdate[0]:
             distanciasFinales[nodeToUpdate[1]
                               ] = distanciasFinales[currentIndex] + nodeToUpdate[0]
@@ -84,7 +78,7 @@ def buscar_repetidos(lista_tuplas):
     contador = -1
     for tupla in lista_tuplas:
         valoresRepetidos.append(tupla[0])
-    
+
     valoresRepetidos.sort()
     minimoValor = valoresRepetidos[0]
 
@@ -93,34 +87,44 @@ def buscar_repetidos(lista_tuplas):
             contador += 1
     if contador == 0:
         return -1, -1
-    else: 
+    else:
         return minimoValor, contador
 
 
 def getShortestPath(matrizPesos, currentIndex, distanciasFinales, visited, stepsList):
 
     shortestPath = []
+    listaNodosVisitados = []
 
     for i,  value in enumerate(matrizPesos[currentIndex]):
+        if value != 0 and visited[currentIndex][i] == True:
+            listaNodosVisitados.append((value, i))
         if value != 0 and visited[currentIndex][i] == False:
             shortestPath.append((value, i))
 
+    listaNodosVisitados = sorted(listaNodosVisitados, key=lambda x: x[0])
     shortestPath = sorted(shortestPath, key=lambda x: x[0])
 
-    print(shortestPath)
 
     if len(shortestPath) > 0:
         valorRepetido, repeticiones = buscar_repetidos(shortestPath)
         if shortestPath[0][0] == valorRepetido:
             for i in range(repeticiones):
-                updateVisited(visited, currentIndex, shortestPath[i+1][1])
+                visited = updateVisited(
+                    visited, currentIndex, shortestPath[i+1][1])
 
     # Actualiza los tiempos estimados por cada nodo observado desde otro nodo
-    for i, nodeToUpdate in enumerate(shortestPath):
-        distanciasFinales, visited = actualizarPesos(
-            distanciasFinales, nodeToUpdate, stepsList, i, visited, currentIndex)
+    if len(shortestPath) == 0:
+        for i, nodeToUpdate in enumerate(listaNodosVisitados):
+            distanciasFinales, visited = actualizarPesos(
+                distanciasFinales, nodeToUpdate, stepsList, i, visited, currentIndex)
+        return listaNodosVisitados[0][1], distanciasFinales, visited
+    else:
+        for i, nodeToUpdate in enumerate(shortestPath):
+            distanciasFinales, visited = actualizarPesos(
+                distanciasFinales, nodeToUpdate, stepsList, i, visited, currentIndex)
+        return shortestPath[0][1], distanciasFinales, visited
 
-    return shortestPath[0][1], distanciasFinales, visited
 
 
 def dijkstra(matrizPesos, puntoInicial, puntoFinal):
@@ -136,7 +140,6 @@ def dijkstra(matrizPesos, puntoInicial, puntoFinal):
 
     # Todo FALSO porque no hemos visitado ni un Nodo
     visited = initializeVisitedMatrix(dimensiones, puntoInicial)
-    visited = np.array(visited)
 
     # Mientras que el punto final no se considere visitado, aplicar dijkstra
     while True:
